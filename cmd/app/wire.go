@@ -6,9 +6,9 @@ package app
 import (
 	"github.com/google/wire"
 	"github.com/labstack/echo/v4"
-	"nightingale/config"
-	"nightingale/infra"
-	shareddom "nightingale/internal/shared/adapter/inbound/http"
+	"live-coding/config"
+	"live-coding/infra"
+	shareddom "live-coding/internal/shared/adapter/inbound/http"
 )
 
 var inboundSet = wire.NewSet()
@@ -16,7 +16,6 @@ var inboundSet = wire.NewSet()
 var infraSet = wire.NewSet(
 	infra.NewHttpServer,
 	infra.NewDBWithTX,
-	infra.NewKafkaClient,
 	infra.NewRedisClient,
 	provideHttpDependencies,
 	provideRunInTransaction,

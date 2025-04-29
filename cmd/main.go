@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/spf13/cobra"
+	"live-coding/cmd/app"
 	"log/slog"
-	"nightingale/cmd/app"
 )
 
 func main() {

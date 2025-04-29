@@ -9,9 +9,9 @@ package app
 import (
 	"github.com/google/wire"
 	"github.com/labstack/echo/v4"
-	"nightingale/config"
-	"nightingale/infra"
-	"nightingale/internal/shared/adapter/inbound/http"
+	"live-coding/config"
+	"live-coding/infra"
+	"live-coding/internal/shared/adapter/inbound/http"
 )
 
 // Injectors from wire.go:
@@ -37,7 +37,7 @@ func InitHttp(configConfig config.Config) (Http, func(), error) {
 
 var inboundSet = wire.NewSet()
 
-var infraSet = wire.NewSet(infra.NewHttpServer, infra.NewDBWithTX, infra.NewKafkaClient, infra.NewRedisClient, provideHttpDependencies,
+var infraSet = wire.NewSet(infra.NewHttpServer, infra.NewDBWithTX, infra.NewRedisClient, provideHttpDependencies,
 	provideRunInTransaction,
 )
 
