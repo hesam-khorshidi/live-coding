@@ -1,6 +1,7 @@
 package model
 
 import (
+	"github.com/google/uuid"
 	"github.com/uptrace/bun"
 	"live-coding/internal/user/core/domain"
 	"live-coding/pkg/slice"
@@ -8,15 +9,16 @@ import (
 
 type User struct {
 	bun.BaseModel `bun:"table:users,alias:u"`
-	ID            int64     `bun:"pk,id"`
+	ID            uuid.UUID `bun:"id,pk,type:uuid"`
 	Name          string    `bun:"name"`
 	Email         string    `bun:"email"`
 	PhoneNumber   string    `bun:"phone_number"`
-	Addresses     []Address `bun:"rel:has-many,join:user_id"`
+	Addresses     []Address `bun:"rel:has-many,join:id=user_id"`
 }
 
 func (u User) ToDomain() domain.User {
 	return domain.User{
+		ID:          u.ID,
 		Name:        u.Name,
 		Email:       u.Email,
 		PhoneNumber: u.PhoneNumber,
@@ -26,12 +28,12 @@ func (u User) ToDomain() domain.User {
 
 func UserToModel(user domain.User) User {
 	addresses := slice.Convert(user.Addresses, AddressToModel)
-	for _, address := range addresses {
-		address.UserID = int64(user.ID)
+	for i := range addresses {
+		addresses[i].UserID = user.ID
 	}
 
 	return User{
-		ID:          int64(user.ID),
+		ID:          user.ID,
 		Name:        user.Name,
 		Email:       user.Email,
 		PhoneNumber: user.PhoneNumber,

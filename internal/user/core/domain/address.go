@@ -1,9 +1,11 @@
 package domain
 
-import sharedvo "live-coding/internal/shared/domain/value_object"
+import (
+	"github.com/google/uuid"
+)
 
 type Address struct {
-	ID      sharedvo.ID
+	ID      uuid.UUID
 	Street  string
 	City    string
 	State   string

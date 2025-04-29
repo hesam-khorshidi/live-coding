@@ -11,7 +11,13 @@ import (
 	"github.com/labstack/echo/v4"
 	"live-coding/config"
 	"live-coding/infra"
-	"live-coding/internal/shared/adapter/inbound/http"
+	http2 "live-coding/internal/shared/adapter/inbound/http"
+	"live-coding/internal/user/adapter/inbound/http"
+	"live-coding/internal/user/adapter/outbound/file"
+	"live-coding/internal/user/adapter/outbound/sql/user_repo"
+	"live-coding/internal/user/core/port/inbound"
+	"live-coding/internal/user/core/port/outbound"
+	"live-coding/internal/user/core/service/user_srv"
 )
 
 // Injectors from wire.go:
@@ -27,15 +33,23 @@ func InitHttp(configConfig config.Config) (Http, func(), error) {
 		cleanup()
 		return Http{}, nil, err
 	}
-	http := provideHttp(echo)
-	return http, func() {
+	httpServerConfig := provideHttpServerConfig(configConfig)
+	dependencies := provideHttpDependencies(echo, httpServerConfig)
+	repository := user_repo.New(txDB)
+	fileConfig := provideFileConfig(configConfig)
+	service := file.New(fileConfig)
+	workerConfig := provideWorkerConfig(configConfig)
+	user_srvService := user_srv.New(repository, service, workerConfig)
+	controller := http.Init(dependencies, user_srvService)
+	appHttp := provideHttp(echo, controller)
+	return appHttp, func() {
 		cleanup()
 	}, nil
 }
 
 // wire.go:
 
-var inboundSet = wire.NewSet()
+var inboundSet = wire.NewSet(http.Init)
 
 var infraSet = wire.NewSet(infra.NewHttpServer, infra.NewDBWithTX, infra.NewRedisClient, provideHttpDependencies,
 	provideRunInTransaction,
@@ -44,18 +58,19 @@ var infraSet = wire.NewSet(infra.NewHttpServer, infra.NewDBWithTX, infra.NewRedi
 var configSet = wire.NewSet(
 	provideHttpServerConfig,
 	provideDatabaseConfig,
-	provideKafkaConfig,
+	provideWorkerConfig,
+	provideFileConfig,
 )
 
-var serviceSet = wire.NewSet()
+var serviceSet = wire.NewSet(user_srv.New, wire.Bind(new(inbound.UserService), new(user_srv.Service)))
 
-func provideHttpDependencies(e *echo.Echo, cfg infra.HTTPServerConfig) http.Dependencies {
+var outboundSet = wire.NewSet(user_repo.New, wire.Bind(new(outbound.UserRepository), new(user_repo.Repository)), file.New, wire.Bind(new(outbound.UserReaderService), new(file.Service)))
 
-	return http.Dependencies{
-		Echo:        e,
-		Middlewares: http.Middlewares{},
-		Prefix:      cfg.ApiPrefix + cfg.ApiVersion,
-		Debug:       cfg.Debug,
+func provideHttpDependencies(e *echo.Echo, cfg infra.HTTPServerConfig) http2.Dependencies {
+	return http2.Dependencies{
+		Echo:   e,
+		Prefix: cfg.ApiPrefix + cfg.ApiVersion,
+		Debug:  cfg.Debug,
 	}
 }
 
@@ -84,8 +99,12 @@ func provideHttpServerConfig(cfg config.Config) infra.HTTPServerConfig {
 	}
 }
 
-func provideKafkaConfig(cfg config.Config) config.KafkaConfig {
-	return cfg.Kafka
+func provideFileConfig(cfg config.Config) config.FileConfig {
+	return cfg.FileConfig
+}
+
+func provideWorkerConfig(cfg config.Config) config.WorkerConfig {
+	return cfg.WorkerConfig
 }
 
 func provideRunInTransaction(txDB *infra.TxDB) infra.IRunInTransaction {
@@ -94,6 +113,7 @@ func provideRunInTransaction(txDB *infra.TxDB) infra.IRunInTransaction {
 
 func provideHttp(
 	server *echo.Echo,
+	_ http.Controller,
 ) Http {
 	return newHttp(server)
 }

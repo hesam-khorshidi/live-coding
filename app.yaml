@@ -1,7 +1,7 @@
 app:
-  name: "My Application"
+  name: "Live coding test"
   version: "1.0.0"
-  environment: "development"
+  environment: "production"
 
 server:
   host: "localhost"
@@ -13,10 +13,10 @@ server:
 
 database:
   host: "localhost"
-  port: 5887
-  username: "nightingaleuser"
-  password: "app_password"
-  name: "nightingale"
+  port: 5432
+  username: "devuser"
+  password: "devpass"
+  name: "live_coding"
   timezone: "Asia/Tehran"
   ssl_mode: "disable"
 
@@ -25,11 +25,8 @@ logging:
   level: "info"
   format: "json"
 
-kafka:
-  host: "localhost"
-  port: 9093
-  brokers:
-    - "localhost:9092"
-  topic: "my_topic"
-  partition: 1
-  group_id: "consumer_group"
+file:
+  user_json: "./users_data.json"
+
+worker:
+  user_worker_count: 10

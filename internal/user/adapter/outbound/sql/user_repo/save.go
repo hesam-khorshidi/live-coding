@@ -13,12 +13,14 @@ func (r Repository) Save(ctx context.Context, user domain.User) error {
 	}
 
 	um := model.UserToModel(user)
-	_, err := db.NewInsert().
-		Model(&um).
-		Exec(ctx)
-
-	if err != nil {
+	if _, err := db.NewInsert().Model(&um).Exec(ctx); err != nil {
 		return err
+	}
+
+	if len(um.Addresses) > 0 {
+		if _, err := db.NewInsert().Model(&um.Addresses).Exec(ctx); err != nil {
+			return err
+		}
 	}
 
 	return nil
