@@ -12,7 +12,7 @@ type Controller struct {
 func Init(d http.Dependencies, userSrv inbound.UserService) Controller {
 	c := Controller{userSrv}
 
-	g := d.Echo.Group(d.Prefix + "/user")
+	g := d.Echo.Group(d.Prefix + "/users")
 	g.GET("/:id", c.GetUser)
 	g.POST("/ingest", c.IngestUsers)
 

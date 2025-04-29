@@ -32,7 +32,7 @@ type AddressResponse struct {
 // @Failure      400  {object}  http.Response
 // @Failure      404  {object}  http.Response
 // @Failure      500  {object}  http.Response
-// @Router       /user/{id} [get]
+// @Router       /users/{id} [get]
 func (c Controller) GetUser(ctx echo.Context) error {
 	id, err := http.UUIDParamLoader(ctx, "id")
 	if err != nil {

@@ -3,7 +3,9 @@ package file
 import (
 	"context"
 	"encoding/json"
+	"live-coding/internal/user/adapter/outbound/file/dto"
 	"live-coding/internal/user/core/domain"
+	"live-coding/pkg/slice"
 	"os"
 )
 
@@ -13,10 +15,10 @@ func (r Service) ReadUsers(ctx context.Context) ([]domain.User, error) {
 		return nil, err
 	}
 
-	var users []domain.User
+	var users []dto.User
 	if err = json.Unmarshal(data, &users); err != nil {
 		return nil, err
 	}
 
-	return users, nil
+	return slice.Convert(users, dto.UserToDomain), nil
 }

@@ -38,7 +38,7 @@ info:
   title: Live Coding Session
   version: "1.0"
 paths:
-  /user/{id}:
+  /users/{id}:
     get:
       description: Get user info by id
       parameters:
