@@ -41,21 +41,21 @@ type LoggingConfig struct {
 	Format  string `mapstructure:"format" validate:"oneof=json text"`
 }
 
-type KafkaConfig struct {
-	Host      string   `mapstructure:"host" validate:"required"`
-	Port      int      `mapstructure:"port" validate:"required"`
-	Brokers   []string `mapstructure:"brokers" validate:"required,dive,required"`
-	Topic     string   `mapstructure:"topic" validate:"required"`
-	Partition int      `mapstructure:"partition" validate:"required"`
-	GroupID   string   `mapstructure:"group_id" validate:"required"`
+type FileConfig struct {
+	UserJson string `mapstructure:"user_json" validate:"required"`
+}
+
+type WorkerConfig struct {
+	UserWorkerCount int `mapstructure:"user_worker_count" validate:"required"`
 }
 
 type Config struct {
-	App      AppConfig      `mapstructure:"app"`
-	Server   ServerConfig   `mapstructure:"server"`
-	Database DatabaseConfig `mapstructure:"database"`
-	Kafka    KafkaConfig    `mapstructure:"kafka"`
-	Logging  LoggingConfig  `mapstructure:"logging"`
+	App          AppConfig      `mapstructure:"app"`
+	Server       ServerConfig   `mapstructure:"server"`
+	Database     DatabaseConfig `mapstructure:"database"`
+	Logging      LoggingConfig  `mapstructure:"logging"`
+	FileConfig   FileConfig     `mapstructure:"file"`
+	WorkerConfig WorkerConfig   `mapstructure:"worker"`
 }
 
 func LoadConfig(path string) (*Config, error) {

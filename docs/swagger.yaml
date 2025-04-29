@@ -1,0 +1,94 @@
+basePath: /api/v1
+definitions:
+  http.AddressResponse:
+    properties:
+      city:
+        type: string
+      country:
+        type: string
+      state:
+        type: string
+      street:
+        type: string
+      zip_code:
+        type: string
+    type: object
+  http.Response:
+    properties:
+      success:
+        type: boolean
+    type: object
+  http.UserResponse:
+    properties:
+      addresses:
+        items:
+          $ref: '#/definitions/http.AddressResponse'
+        type: array
+      email:
+        type: string
+      name:
+        type: string
+      phone_number:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Live Coding
+  title: Live Coding Session
+  version: "1.0"
+paths:
+  /user/{id}:
+    get:
+      description: Get user info by id
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/http.UserResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.Response'
+      summary: Get User
+      tags:
+      - User
+  /users/ingest:
+    post:
+      description: Start user ingestion from json file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.Response'
+      summary: Ingest users
+      tags:
+      - User
+swagger: "2.0"

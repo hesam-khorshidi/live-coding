@@ -1,0 +1,17 @@
+START TRANSACTION;
+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+CREATE TABLE IF NOT EXISTS addresses (
+    id uuid PRIMARY KEY,
+    user_id uuid NOT NULL,
+    street TEXT NOT NULL,
+    city TEXT NOT NULL,
+    state TEXT NOT NULL,
+    zip_code TEXT NOT NULL,
+    country TEXT NOT NULL
+);
+
+ALTER TABLE addresses ADD CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
+
+COMMIT TRANSACTION;
