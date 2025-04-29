@@ -1,0 +1,35 @@
+app:
+  name: "My Application"
+  version: "1.0.0"
+  environment: "development"
+
+server:
+  host: "localhost"
+  port: "8080"
+  timeout: "30s"
+  protocol: http
+  api_prefix: "/api"
+  api_version: "/v1"
+
+database:
+  host: "localhost"
+  port: 5887
+  username: "nightingaleuser"
+  password: "app_password"
+  name: "nightingale"
+  timezone: "Asia/Tehran"
+  ssl_mode: "disable"
+
+logging:
+  enabled: "true"
+  level: "info"
+  format: "json"
+
+kafka:
+  host: "localhost"
+  port: 9093
+  brokers:
+    - "localhost:9092"
+  topic: "my_topic"
+  partition: 1
+  group_id: "consumer_group"
